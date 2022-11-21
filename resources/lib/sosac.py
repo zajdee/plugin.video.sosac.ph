@@ -23,6 +23,7 @@
 import urllib.request, urllib.parse, urllib.error
 import http.cookiejar
 import hashlib
+import locale
 import sys
 import json
 import datetime
@@ -499,8 +500,11 @@ class SosacContentProvider(ContentProvider):
         req.add_header('User-Agent', util.UA)
         try:
             response = urllib.request.urlopen(req)
+            saved_locale = locale._setlocale(locale.LC_TIME)
+            locale.setlocale(locale.LC_TIME, 'C')
             lastmodtime = time.strptime(response.info().get_all('Last-Modified')[0], 
                 '%a, %d %b %Y %H:%M:%S %Z')
+            locale.setlocale(locale.LC_TIME, saved_locale)
             lastmod = datetime.datetime(*lastmodtime[:6]).strftime('%d.%m.%Y')
             response.close()
         except urllib.error.HTTPError as error:
